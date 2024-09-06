@@ -96,16 +96,18 @@ def paint_trace():
     plt.savefig("f_theta.pgf")
     plt.cla()
 
-    # theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.01)
-    # r = f(theta)
-    # ax.plot(theta, r)
-    #
-    # ax.set_xlim(- 5 * 2 * np.pi, 5 * 2 * np.pi)
-    # ax.set_ylim(0, 10)
-    # ax.set_aspect('equal', adjustable='box')
-    # plt.savefig("f_value.pdf")
-    # plt.savefig("f_value.pgf")
-    # plt.cla()
+    theta = np.arange(- 5 * 2 * np.pi + delta_theta, 5 * 2 * np.pi + 0.01, 0.01)
+    r = f(theta)
+    ax.plot(theta, r)
+
+    ax.set_xlim(- 5 * 2 * np.pi + delta_theta, 5 * 2 * np.pi)
+    ax.set_ylim(0, 10)
+    ax.set_xlabel("$\\theta$")
+    ax.set_ylabel("$r$")
+    ax.set_aspect('equal', adjustable='box')
+    plt.savefig("f_value.pdf")
+    plt.savefig("f_value.pgf")
+    plt.cla()
 
 paint_trace()
 
