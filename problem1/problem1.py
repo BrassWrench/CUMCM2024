@@ -29,7 +29,7 @@ def get_phi(r, r_next, theta, theta_next):
 
 def next_v_theta(v_theta, phi_s, phi_e, r, r_next, k):
     """速度vθ递推"""
-    v_theta_next = (np.cos(phi_s) + (k / r) * np.sin(phi_s)) / (np.cos(phi_e) + (k / r_next) * np.sin(phi_e)) * v_theta
+    v_theta_next = ((k / r) * np.cos(phi_s) - np.sin(phi_s)) / ( (k / r_next) * np.cos(phi_e) - np.sin(phi_e)) * v_theta
     return v_theta_next
 
 def get_r(theta, k):
@@ -61,7 +61,7 @@ def get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num):
     result_v = []
     r0 = get_r(theta0, k)
     x0, y0 = get_xy(r0, theta0)
-    v_theta_0 = v0 / np.sqrt((k / r0)**2 + 1)
+    v_theta_0 = - v0 / np.sqrt((k / r0)**2 + 1)
     result_x.append(x0.item())
     result_y.append(y0.item())
     result_v.append(v0.item())
@@ -149,6 +149,8 @@ if __name__ == '__main__':
     # theta0 = get_theta_from_time(300, k, v0, round_num)
     #
     # x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
+    #
+    # print(v)
 
     # x_spiral, y_spiral = get_spiral(k, round_num)
     # plt.plot(x_spiral, y_spiral)
