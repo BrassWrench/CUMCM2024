@@ -1,19 +1,18 @@
-import numpy as np
-from scipy.optimize import fsolve
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
-def next_theta(theta, k, d):
-    """θ角递推"""
-    def f(theta_next):
-        return theta**2 + theta_next**2 - 2 * theta * theta_next * np.cos(theta_next - theta) - d**2 / k**2
-    x = np.linspace(theta, theta + 3, 1000)
-    plt.plot(x, f(x))
-    plt.plot(x, np.zeros_like(x))
-    theta_next = fsolve(f, theta+1)
-    print(f"theta:{np.rad2deg(theta)},{theta}, k:{k}, d:{d}, theta_next:{np.rad2deg(theta_next)},{theta_next}")
-    plt.scatter(theta_next, 0)
-    plt.show()
-    return theta_next
+def Intersection_over_rectangle(rectangle1, rectangle2):
+    r1 = Rectangle((rectangle1[0], rectangle1[1]), rectangle1[2], rectangle1[3])
+    r2 = Rectangle((rectangle2[0], rectangle2[1]), rectangle2[2], rectangle2[3])
+    ir = r1.intersection(r2)
 
-next_theta(32.20, 0.0875, 1.65)
+    if ir.width <= 0 or ir.height <= 0:
+        return 0
+    else:
+        return ir.width * ir.height
+
+rectangle1 = (1, 1, 3, 3)
+rectangle2 = (2, 2, 3, 3)
+
+intersection_area = Intersection_over_rectangle(rectangle1, rectangle2)
+
+print(intersection_area) # 输出结果为4

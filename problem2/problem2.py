@@ -2,8 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
-from rich.style import NULL_STYLE
-
+from shapely.geometry import Polygon
 from problem1.problem1 import *
 
 mpl.use("pgf")
@@ -25,7 +24,7 @@ def get_rectangle(x, y, x_next, y_next):
     width = np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2) + 2 * 0.275
     height = 0.3
     angle = np.rad2deg(np.arctan2(y_next - y, x_next - x))
-    rect = patches.Rectangle((anchor_x, anchor_y), width=width, height=height, angle=angle, rotation_point="xy", linewidth=0.1, edgecolor='r', facecolor='none')
+    rect = patches.Rectangle((anchor_x, anchor_y), width=width, height=height, angle=angle, rotation_point="xy", linewidth=0.5, edgecolor='b', facecolor='none')
     return rect
 
 def get_rectangles(x, y):
@@ -37,11 +36,25 @@ def get_rectangles(x, y):
         rectangles.append(rect)
     return rectangles
 
+def is_overlap(rect1_corner, rect2_corner):
+    rect1 = Polygon(rect1_corner)
+    rect2 = Polygon(rect2_corner)
+    return rect1.intersects(rect2)
+
 def check_collision(rectangles):
     is_collision = False
-    for i in range(2, 20):
-        if rectangles[0].get_bbox().overlaps(rectangles[i].get_bbox()):
-            is_collision = True
+    # for i in range(2, 20):
+    #     if rectangles[0].get_bbox().overlaps(rectangles[i].get_bbox()):
+    #         is_collision = True
+    #         break
+    for i in range(len(rectangles)):
+        for j in range(i + 2, len(rectangles)):
+            if is_overlap(rectangles[i].get_corners(), rectangles[j].get_corners()):
+                is_collision = True
+                rectangles[i].set_edgecolor('r')
+                rectangles[j].set_edgecolor('r')
+                break
+        if is_collision:
             break
     return is_collision
 
@@ -67,7 +80,7 @@ if __name__ == '__main__':
     t_collision = 0
     rectangles_collision = []
     x_collision, y_collision, v_collision = [], [], []
-    for t in np.arange(401.7, 402, 0.001):
+    for t in np.arange(400, 450, 1):
         theta0 = get_theta_from_time(t, k, v0, round_num)
         x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
         rectangles = get_rectangles(x, y)
