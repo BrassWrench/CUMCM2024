@@ -94,3 +94,6 @@ def paint_trace():
     ax.set_ylim(-10, 10)
     ax.set_aspect('equal', adjustable='box')
     plt.savefig("f_theta.pdf")
+    plt.savefig("f_theta.pgf")
+
+paint_trace()
