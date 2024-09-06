@@ -40,7 +40,7 @@ theta3_l = theta4 + (np.arctan2(cut_point4[1], cut_point4[0]) - np.arctan2(cut_p
 theta_r = theta3_r
 theta_l = theta3_l
 
-def f(theta):
+def f_value(theta):
     if theta > theta1:
         return k * theta
     elif theta2 <= theta <= theta1:
@@ -53,41 +53,23 @@ def f(theta):
         return - k * theta
     return np.nan
 
-def get_xy(r, theta, inverse=False):
-    if inverse:
-        x = - r * np.cos(theta)
-        y = r * np.sin(theta)
+def f(theta):
+    if isinstance(theta, (np.ndarray, list, tuple)):
+        return np.array([f_value(theta) for theta in theta])
     else:
-        x = r * np.cos(theta)
-        y = r * np.sin(theta)
+        return f_value(theta)
+
+def get_xy(r, theta):
+    x = np.sign(theta) * r * np.cos(theta)
+    y = r * np.sin(theta)
     return x, y
 
 def paint_trace():
     fig, ax = plt.subplots()
 
-    theta = np.arange(theta1, 5 * 2 * np.pi + 0.01, 0.01)
-    r = np.array([f(theta) for theta in theta])
+    theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.001)
+    r = f(theta)
     x, y = get_xy(r, theta)
-    ax.plot(x, y)
-
-    theta = np.arange(theta2, theta1, 0.01)
-    r = np.array([f(theta) for theta in theta])
-    x, y = get_xy(r, theta)
-    ax.plot(x, y)
-
-    theta = np.arange(theta3_r, theta2, 0.01)
-    r = np.array([f(theta) for theta in theta])
-    x, y = get_xy(r, theta)
-    ax.plot(x, y)
-
-    theta = np.arange(theta4, theta3_l + 0.01, 0.01)
-    r = np.array([f(theta) for theta in theta])
-    x, y = get_xy(r, theta, inverse=True)
-    ax.plot(x, y)
-
-    theta = np.arange(- 5 * 2 * np.pi, theta4 + 0.01, 0.01)
-    r = np.array([f(theta) for theta in theta])
-    x, y = get_xy(r, theta, inverse=True)
     ax.plot(x, y)
 
     ax.set_xlim(-10, 10)
@@ -95,5 +77,18 @@ def paint_trace():
     ax.set_aspect('equal', adjustable='box')
     plt.savefig("f_theta.pdf")
     plt.savefig("f_theta.pgf")
+    plt.cla()
+
+    # theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.01)
+    # r = f(theta)
+    # ax.plot(theta, r)
+    #
+    # ax.set_xlim(- 5 * 2 * np.pi, 5 * 2 * np.pi)
+    # ax.set_ylim(0, 10)
+    # ax.set_aspect('equal', adjustable='box')
+    # plt.savefig("f_value.pdf")
+    # plt.savefig("f_value.pgf")
+    # plt.cla()
 
 paint_trace()
+
