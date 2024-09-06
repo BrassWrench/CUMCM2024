@@ -146,29 +146,27 @@ if __name__ == '__main__':
     num = np.array(num)
     round_num = np.array(round_num)
 
-    # theta0 = get_theta_from_time(300, k, v0, round_num)
+    theta0 = get_theta_from_time(300, k, v0, round_num)
+
+    x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
+
+    x_spiral, y_spiral = get_spiral(k, round_num)
+    plt.plot(x_spiral, y_spiral)
+    plt.plot(x, y)
+    plt.scatter(x, y)
+    plt.savefig("line_graph.pgf")
+
+    # df_positions = pd.read_excel("result1.xlsx", sheet_name="位置")
+    # df_velocities = pd.read_excel("result1.xlsx", sheet_name="速度")
     #
-    # x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
+    # for t in tqdm(range(300 + 1), desc="进度"):
+    #     theta0 = get_theta_from_time(t, k, v0, round_num)
+    #     x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
+    #     for i in range(223 + 1):
+    #         df_positions.iloc[2 * i, t + 1] = x[i]
+    #         df_positions.iloc[2 * i + 1, t + 1] = y[i]
+    #         df_velocities.iloc[i, t + 1] = v[i]
     #
-    # print(v)
-
-    # x_spiral, y_spiral = get_spiral(k, round_num)
-    # plt.plot(x_spiral, y_spiral)
-    # plt.plot(x, y)
-    # plt.scatter(x, y)
-    # plt.savefig("line_graph.pdf")
-
-    df_positions = pd.read_excel("result1.xlsx", sheet_name="位置")
-    df_velocities = pd.read_excel("result1.xlsx", sheet_name="速度")
-
-    for t in tqdm(range(300 + 1), desc="进度"):
-        theta0 = get_theta_from_time(t, k, v0, round_num)
-        x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
-        for i in range(223 + 1):
-            df_positions.iloc[2 * i, t + 1] = x[i]
-            df_positions.iloc[2 * i + 1, t + 1] = y[i]
-            df_velocities.iloc[i, t + 1] = v[i]
-
-    with pd.ExcelWriter("result1.xlsx") as writer:
-        df_positions.to_excel(writer, sheet_name="位置", index=False, float_format="%.6f")
-        df_velocities.to_excel(writer, sheet_name="速度", index=False, float_format="%.6f")
+    # with pd.ExcelWriter("result1.xlsx") as writer:
+    #     df_positions.to_excel(writer, sheet_name="位置", index=False, float_format="%.6f")
+    #     df_velocities.to_excel(writer, sheet_name="速度", index=False, float_format="%.6f")
