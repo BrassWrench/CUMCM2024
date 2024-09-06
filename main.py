@@ -7,9 +7,9 @@ from problem2.problem2 import *
 from problem3.problem3 import *
 
 def get_inverse_spiral(k, round_num):
-    theta = np.linspace(- 2 * np.pi * round_num, 0, 1000)
-    r = - k * theta
-    x = - r * np.cos(theta)
+    theta = np.linspace(np.pi, round_num * 2 * np.pi + np.pi, 1000)
+    r = k * (theta - np.pi)
+    x = r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y
 

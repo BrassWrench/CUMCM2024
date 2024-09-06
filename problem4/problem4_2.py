@@ -5,6 +5,7 @@ import numpy as np
 from problem1.problem1 import *
 from problem2.problem2 import *
 from problem3.problem3 import *
+from scipy.optimize import fsolve
 
 mpl.use("pgf")
 pgf_with_pdflatex = {
@@ -27,24 +28,25 @@ R2=np.array(1.5027088338780752)#第二个圆的半径
 O1 = np.array((-0.7600091139658178,-1.3057264286867012))#第一个圆的圆心
 O2 = np.array((1.7359324888362324,2.4484019757238924))#第二个圆的圆心
 k = np.array(1.7 / (2 * np.pi))
+
 r1 = np.sqrt(cut_point1[0] ** 2 + cut_point1[1] ** 2)
 theta1 = r1 / k
 r2 = np.sqrt(cut_point2[0] ** 2 + cut_point2[1] ** 2)
 theta2 =  theta1 - (np.arctan2(cut_point1[1], cut_point1[0]) + 2 * np.pi - np.arctan2(cut_point2[1], cut_point2[0]))
-r3 = np.sqrt(cut_point3[0] ** 2 + cut_point3[1] ** 2)
-theta3_r = theta2 - (np.arctan2(cut_point2[1], cut_point2[0]) - np.arctan2(cut_point3[1], cut_point3[0]))
 r4 = np.sqrt(cut_point4[0] ** 2 + cut_point4[1] ** 2)
-theta4 = - r4 / k
-theta3_l = theta4 + (np.arctan2(cut_point4[1], cut_point4[0]) - np.arctan2(cut_point3[1], cut_point3[0]))
+theta4 = r4 / k + np.pi
+r3 = np.sqrt(cut_point3[0] ** 2 + cut_point3[1] ** 2)
+theta3_in = theta2 - (np.arctan2(cut_point2[1], cut_point2[0]) - np.arctan2(cut_point3[1], cut_point3[0]))
+theta3_out = theta4 - (np.arctan2(cut_point4[1], cut_point4[0]) - np.arctan2(cut_point3[1], cut_point3[0]))
 
-theta_r = theta3_r
-theta_l = theta3_l
-delta_theta = theta_r - theta_l
+theta_in = theta3_in
+theta_out = theta3_out
 
 def xi_to_theta_value(xi):
-    if xi <= theta_r:
-        return xi - delta_theta
-    return xi
+    if xi <= 0:
+        return - xi + theta_in
+    elif xi >= 0:
+        return xi + theta_out
 
 def xi_to_theta(xi):
     if isinstance(xi, (np.ndarray, list, tuple)):
@@ -52,32 +54,41 @@ def xi_to_theta(xi):
     else:
         return xi_to_theta_value(xi)
 
-def theta_to_xi_value(theta):
-    if theta <= theta_l:
-        return theta + delta_theta
-    elif theta_l <= theta <= theta_r:
-        return np.nan
-    return theta
+def theta_to_xi_value(theta, state):
+    if state == "in" and theta >= theta_in:
+        return - (theta - theta_in)
+    elif state == "out" and theta >= theta_out:
+        return theta - theta_out
+    return np.nan
 
-def theta_to_xi(theta):
+def theta_to_xi(theta, state):
     if isinstance(theta, (np.ndarray, list, tuple)):
-        return np.array([theta_to_xi_value(theta) for theta in theta])
+        return np.array([theta_to_xi_value(theta, state) for theta in theta])
     else:
-        return theta_to_xi_value(theta)
+        return theta_to_xi_value(theta, state)
+
+def get_in_and_out(theta_max, interval):
+    xi_in = theta_to_xi(np.flip(np.arange(theta_in, theta_max + interval, interval)), state="in")
+    xi_out = theta_to_xi(np.arange(theta_out, theta_max + np.pi + interval, interval), state="out")
+    xi = np.hstack((xi_in, xi_out))
+    return xi
 
 def f_value(xi):
-    theta = xi_to_theta(xi)
-    if theta > theta1:
-        return k * theta
-    elif theta2 <= theta <= theta1:
-        return O1[0] * np.cos(theta) + O1[1] * np.sin(theta) + np.sqrt(R1**2 - (O1[0] * np.sin(theta) - O1[1] * np.cos(theta)) ** 2)
-    elif theta3_r <= theta <= theta2:
-        return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) - np.sqrt(R2**2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
-    elif theta4<= theta <= theta3_l:
-        return - O2[0] * np.cos(theta) + O2[1] * np.sin(theta) + np.sqrt(R2**2 - ( - O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
-    elif theta <= theta4:
-        return - k * theta
-    return np.nan
+    if xi < 0:
+        theta = xi_to_theta_value(xi)
+        if theta > theta1:
+            return k * theta
+        elif theta2 <= theta <= theta1:
+            return O1[0] * np.cos(theta) + O1[1] * np.sin(theta) + np.sqrt(R1 ** 2 - (O1[0] * np.sin(theta) - O1[1] * np.cos(theta)) ** 2)
+        elif theta3_in <= theta <= theta2:
+            return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) - np.sqrt(R2 ** 2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
+    elif xi > 0:
+        theta = xi_to_theta_value(xi)
+        if theta3_out <= theta <= theta4:
+            return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) + np.sqrt(R2 ** 2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
+        elif theta >= theta4:
+            return k * (theta - np.pi)
+    else: return r3
 
 def f(xi):
     if isinstance(xi, (np.ndarray, list, tuple)):
@@ -85,31 +96,31 @@ def f(xi):
     else:
         return f_value(xi)
 
-def get_xy_value(r, xi):
-    theta = xi_to_theta(xi)
-    x = np.sign(theta) * r * np.cos(theta)
+def get_xy_value(r, theta):
+    x = r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y
 
-def get_xy(r, xi):
-    if isinstance(xi, (np.ndarray, list, tuple)) and isinstance(r, (np.ndarray, list, tuple)):
+def get_xy(r, theta):
+    if isinstance(r, (np.ndarray, list, tuple)) and isinstance(theta, (np.ndarray, list, tuple)):
         x = []
         y = []
-        for r, xi in zip(r, xi):
-            x_now, y_now = get_xy_value(r, xi)
+        for r, theta in zip(r, theta):
+            x_now, y_now = get_xy_value(r, theta)
             x.append(x_now)
             y.append(y_now)
         return np.array(x), np.array(y)
     else:
-        return f_value(xi)
+        return get_xy_value(r, theta)
 
 def paint_trace():
+
     fig, ax = plt.subplots()
 
-    theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.001)
-    xi = theta_to_xi(theta)
+    xi = get_in_and_out(5 * 2 * np.pi, 0.001)
     r = f(xi)
-    x, y = get_xy(r, xi)
+    theta = xi_to_theta(xi)
+    x, y = get_xy(r, theta)
     ax.plot(x, y)
 
     ax.set_xlim(-10, 10)
@@ -119,12 +130,11 @@ def paint_trace():
     plt.savefig("f_theta.pgf")
     plt.cla()
 
-    theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.001)
-    xi = theta_to_xi(theta)
+    xi = get_in_and_out(5 * 2 * np.pi, 0.001)
     r = f(xi)
     ax.plot(xi, r)
 
-    ax.set_xlim(theta_to_xi(- 5 * 2 * np.pi), theta_to_xi(5 * 2 * np.pi))
+    ax.set_xlim(theta_to_xi(5 * 2 * np.pi, state="in"), theta_to_xi(5 * 2 * np.pi, state="out"))
     ax.set_ylim(0, 10)
     ax.set_xlabel("$\\xi$")
     ax.set_ylabel("$r$")
@@ -133,5 +143,12 @@ def paint_trace():
     plt.savefig("f_value.pgf")
     plt.cla()
 
-paint_trace()
+def next_xi(xi, d):
+    def g(xi_next):
+        f_xi = f(xi)
+        f_xi_next = f(xi_next)
+        return f_xi**2 + f_xi_next**2 - 2 * f_xi * f_xi_next * np.cos(f_xi_next - f_xi) - d**2
+    xi_next = fsolve(g, xi + 0.2)
+    return xi_next
 
+paint_trace()
