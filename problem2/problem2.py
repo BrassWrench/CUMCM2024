@@ -60,6 +60,7 @@ def get_collision_by_t(t_start, v0, k, d, d_prime, num, round_num):
     x_collision, y_collision, v_collision = [], [], []
     for t in np.arange(t_start, 500, 1):
         theta0 = get_theta_from_time(t, k, v0, round_num)
+        print(theta0)
         x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
         rectangles = get_rectangles(x, y)
         if check_collision(rectangles):
