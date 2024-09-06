@@ -54,7 +54,7 @@ def check_collision(rectangles):
             break
     return is_collision
 
-def get_collision(t_start):
+def get_collision_by_t(t_start, v0, k, d, d_prime, num, round_num):
     t_collision = 0
     rectangles_collision = []
     x_collision, y_collision, v_collision = [], [], []
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     round_num = np.array(round_num)
     x_spiral, y_spiral = get_spiral(k, round_num)
 
-    t_collision, rectangles_collision, x_collision, y_collision, v_collision = get_collision(400)
+    t_collision, rectangles_collision, x_collision, y_collision, v_collision = get_collision_by_t(400, v0, k, d, d_prime, num, round_num)
 
     fig, ax = plt.subplots()
     ax.plot(x_spiral, y_spiral, linewidth=1)
@@ -109,4 +109,3 @@ if __name__ == '__main__':
 
     with pd.ExcelWriter("result2.xlsx") as writer:
         df.to_excel(writer, sheet_name="Sheet1", index=False, float_format="%.6f")
-
