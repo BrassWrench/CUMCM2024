@@ -42,6 +42,12 @@ theta3_out = theta4 - (np.arctan2(cut_point4[1], cut_point4[0]) - np.arctan2(cut
 theta_in = theta3_in
 theta_out = theta3_out
 
+d = np.array(2.2 - 2 * 0.275)
+d_prime = np.array(3.41 - 2 * 0.275)
+v0 = np.array(1)
+num = np.array(223)
+round_num = np.array(16)
+
 def xi_to_theta_value(xi):
     if xi <= 0:
         return - xi + theta_in
@@ -143,12 +149,12 @@ def paint_trace():
     plt.savefig("f_value.pgf")
     plt.cla()
 
-def next_xi(xi, d):
-    def g(xi_next):
-        f_xi = f(xi)
-        f_xi_next = f(xi_next)
-        return f_xi**2 + f_xi_next**2 - 2 * f_xi * f_xi_next * np.cos(f_xi_next - f_xi) - d**2
-    xi_next = fsolve(g, xi + 0.2)
-    return xi_next
+def get_track(round_num):
+    xi = get_in_and_out(round_num * 2 * np.pi, 0.001)
+    r = f(xi)
+    theta = xi_to_theta(xi)
+    x, y = get_xy(r, theta)
+    return x, y
 
-paint_trace()
+if __name__ == "__main__":
+    paint_trace()
