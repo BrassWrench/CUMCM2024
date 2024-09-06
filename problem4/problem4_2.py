@@ -39,6 +39,7 @@ theta3_l = theta4 + (np.arctan2(cut_point4[1], cut_point4[0]) - np.arctan2(cut_p
 
 theta_r = theta3_r
 theta_l = theta3_l
+delta_theta = theta_r - theta_l
 
 def f_value(theta):
     if theta > theta1:
@@ -47,9 +48,11 @@ def f_value(theta):
         return O1[0] * np.cos(theta) + O1[1] * np.sin(theta) + np.sqrt(R1**2 - (O1[0] * np.sin(theta) - O1[1] * np.cos(theta)) ** 2)
     elif theta3_r <= theta <= theta2:
         return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) - np.sqrt(R2**2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
-    elif theta4 <= theta <= theta3_l:
+    elif theta4 + delta_theta <= theta <= theta3_l + delta_theta:
+        theta = theta - delta_theta
         return - O2[0] * np.cos(theta) + O2[1] * np.sin(theta) + np.sqrt(R2**2 - ( - O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
-    elif theta <= theta4:
+    elif theta <= theta4 + delta_theta:
+        theta = theta - delta_theta
         return - k * theta
     return np.nan
 
@@ -59,15 +62,29 @@ def f(theta):
     else:
         return f_value(theta)
 
-def get_xy(r, theta):
+def get_xy_value(r, theta):
+    if theta <= theta_r:
+        theta = theta - delta_theta
     x = np.sign(theta) * r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y
 
+def get_xy(r, theta):
+    if isinstance(theta, (np.ndarray, list, tuple)) and isinstance(r, (np.ndarray, list, tuple)):
+        x = []
+        y = []
+        for r, theta in zip(r, theta):
+            x_now, y_now = get_xy_value(r, theta)
+            x.append(x_now)
+            y.append(y_now)
+        return np.array(x), np.array(y)
+    else:
+        return f_value(theta)
+
 def paint_trace():
     fig, ax = plt.subplots()
 
-    theta = np.arange(- 5 * 2 * np.pi, 5 * 2 * np.pi + 0.01, 0.001)
+    theta = np.arange(- 5 * 2 * np.pi + delta_theta, 5 * 2 * np.pi + 0.01, 0.001)
     r = f(theta)
     x, y = get_xy(r, theta)
     ax.plot(x, y)
