@@ -54,11 +54,11 @@ def check_collision(rectangles):
             break
     return is_collision
 
-def get_collision():
+def get_collision(t_start):
     t_collision = 0
     rectangles_collision = []
     x_collision, y_collision, v_collision = [], [], []
-    for t in np.arange(400, 450, 1):
+    for t in np.arange(t_start, 500, 1):
         theta0 = get_theta_from_time(t, k, v0, round_num)
         x, y ,v = get_positions_and_velocities(v0, theta0, k, d, d_prime, num, round_num)
         rectangles = get_rectangles(x, y)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     round_num = np.array(round_num)
     x_spiral, y_spiral = get_spiral(k, round_num)
 
-    t_collision, rectangles_collision, x_collision, y_collision, v_collision = get_collision()
+    t_collision, rectangles_collision, x_collision, y_collision, v_collision = get_collision(400)
 
     fig, ax = plt.subplots()
     ax.plot(x_spiral, y_spiral, linewidth=1)
