@@ -1,18 +1,23 @@
-from matplotlib.patches import Rectangle
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+from problem1.problem1 import *
+from problem2.problem2 import *
+from problem3.problem3 import *
 
-def Intersection_over_rectangle(rectangle1, rectangle2):
-    r1 = Rectangle((rectangle1[0], rectangle1[1]), rectangle1[2], rectangle1[3])
-    r2 = Rectangle((rectangle2[0], rectangle2[1]), rectangle2[2], rectangle2[3])
-    ir = r1.intersection(r2)
+def get_inverse_spiral(k, round_num):
+    theta = np.linspace(- 2 * np.pi * round_num, 0, 1000)
+    r = - k * theta
+    x = - r * np.cos(theta)
+    y = r * np.sin(theta)
+    return x, y
 
-    if ir.width <= 0 or ir.height <= 0:
-        return 0
-    else:
-        return ir.width * ir.height
+x_spiral, y_spiral = get_spiral(1.7 / (2 * np.pi), 4)
+plt.plot(x_spiral, y_spiral)
 
-rectangle1 = (1, 1, 3, 3)
-rectangle2 = (2, 2, 3, 3)
+x_spiral, y_spiral = get_inverse_spiral(1.7 / (2 * np.pi), 4)
+plt.plot(x_spiral, y_spiral)
 
-intersection_area = Intersection_over_rectangle(rectangle1, rectangle2)
-
-print(intersection_area) # 输出结果为4
+plt.savefig("two_spiral.pdf")
+plt.savefig("two_spiral.pgf")
