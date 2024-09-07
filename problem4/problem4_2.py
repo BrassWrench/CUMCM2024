@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 import numpy as np
 from problem1.problem1_old import *
 from problem2.problem2_old import *
-from problem3.problem3 import *
+from problem3.problem3_old import *
 from scipy.optimize import fsolve
 
 mpl.use("pgf")

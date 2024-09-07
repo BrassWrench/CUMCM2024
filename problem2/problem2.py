@@ -1,0 +1,105 @@
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+from shapely.geometry import Polygon
+from problem1.problem1 import Problem1
+from tqdm import tqdm
+import pandas as pd
+
+class Problem2:
+
+    def __init__(self, k, d_body, d_head, v0, num, init_theta0):
+        self.k = np.array(k)
+        self.d_body = np.array(d_body)
+        self.d_head = np.array(d_head)
+        self.v0 = np.array(v0)
+        self.num = np.array(num)
+        self.init_theta0 = np.array(init_theta0)
+
+    def re_init(self, k, d_body, d_head, v0, num, init_theta0):
+        self.k = np.array(k)
+        self.d_body = np.array(d_body)
+        self.d_head = np.array(d_head)
+        self.v0 = np.array(v0)
+        self.num = np.array(num)
+        self.init_theta0 = np.array(init_theta0)
+
+    def get_rectangle(self, x, y, x_next, y_next):
+        nx = (x_next - x) / np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2)
+        ny = (y_next - y) / np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2)
+        mx = - ny
+        my = nx
+        anchor_x = x - nx * 0.275 - mx * 0.15
+        anchor_y = y - ny * 0.275 - my * 0.15
+        width = np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2) + 2 * 0.275
+        height = 0.3
+        angle = np.rad2deg(np.arctan2(y_next - y, x_next - x))
+        rect = patches.Rectangle((anchor_x, anchor_y), width=width, height=height, angle=angle, rotation_point="xy", linewidth=0.5, edgecolor='b', facecolor='none')
+        return rect
+
+    def get_rectangles(self, x, y):
+        rectangles = []
+        for i in range(len(x) - 1):
+            rect = self.get_rectangle(x[i], y[i], x[i + 1], y[i + 1])
+            rectangles.append(rect)
+        return rectangles
+
+    def is_overlap(self, rect1, rect2):
+        rect1 = Polygon(rect1.get_corners())
+        rect2 = Polygon(rect2.get_corners())
+        return rect1.intersects(rect2)
+
+    def check_collision(self, rectangles, theta0):
+        for i in range(2, int((2 * np.pi * self.k * theta0) / self.d_body * 2)):
+            if self.is_overlap(rectangles[0], rectangles[i]):
+                rectangles[0].set_edgecolor('r')
+                rectangles[i].set_edgecolor('r')
+                return True, i
+        return False
+
+    def get_collision_state(self):
+        problem1 = Problem1(k = self.k, d_body = self.d_body, d_head = self.d_head, v0 = self.v0, num = self.num, init_theta0 = self.init_theta0)
+        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{self.k * 2 * np.pi}的碰撞点"):
+            x, y, v = problem1.get_positions_and_velocities(theta0)
+            rectangles = self.get_rectangles(x, y)
+            if self.check_collision(rectangles, theta0):
+                return theta0, rectangles, x, y, v
+
+    def get_curve(self, round_num):
+        """求螺旋曲线"""
+        k = self.k
+        theta = np.arange(0, round_num * 2 * np.pi, 0.01)
+        x = k * theta * np.cos(theta)
+        y = k * theta * np.sin(theta)
+        return x, y
+
+    def save_collision_fig(self, rectangles, x, y, direct):
+        fig, ax = plt.subplots()
+        x_curve, y_curve = self.get_curve(np.max(np.abs(x)) // (2 * np.pi * self.k) + 2)
+        ax.plot(x_curve, y_curve, linewidth=1)
+        ax.scatter(x, y, s=1, color='green')
+        for rectangle in rectangles:
+            ax.add_patch(rectangle)
+        ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
+        ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
+        ax.set_aspect('equal', adjustable='box')
+        plt.savefig(f"{direct}/pdf/collision_state_{self.k * 2 * np.pi : .2f}.pdf")
+        plt.savefig(f"{direct}/pgf/collision_state_{self.k * 2 * np.pi : .2f}.pgf")
+        plt.cla()
+        plt.clf()
+        print(f"保存螺距为{self.k * 2 * np.pi}碰撞状态图像，存放在{direct}/pdf和{direct}/pgf文件夹里。")
+
+    def save_result(self, x, y, v):
+        df = pd.read_excel("problem2/result2.xlsx", sheet_name="Sheet1")
+
+        for i in range(224):
+            df.iloc[i, 1] = x[i]
+            df.iloc[i, 2] = y[i]
+            df.iloc[i, 3] = v[i]
+
+        df.columns.values[0] = ''
+
+        with pd.ExcelWriter("problem2/result2.xlsx") as writer:
+            df.to_excel(writer, sheet_name="Sheet1", index=False, float_format="%.6f")
+
+        print("已将碰撞结果保存到result2.xlsx中。")
