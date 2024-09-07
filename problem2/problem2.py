@@ -20,9 +20,11 @@ class Problem2:
         self.x_collision = None
         self.y_collision = None
         self.v_collision = None
+        self.problem1 = Problem1(k = k, d_body = d_body, d_head = d_head, v0 = v0, num = num, init_theta0 = init_theta0)
 
     def set_k(self, k):
         self.k = np.array(k)
+        self.problem1.set_k(k)
 
     def get_rectangle(self, x, y, x_next, y_next):
         nx = (x_next - x) / np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2)
@@ -50,17 +52,23 @@ class Problem2:
         return rect1.intersects(rect2)
 
     def check_collision(self, rectangles, theta0):
-        for i in range(2, int((2 * np.pi * self.k * theta0) / self.d_body * 2)):
+        for i in range(2, int((2 * np.pi * self.k * theta0 + 4 * np.pi ** 2) / self.d_body)):
             if self.is_overlap(rectangles[0], rectangles[i]):
                 rectangles[0].set_edgecolor('r')
                 rectangles[i].set_edgecolor('r')
-                return True, i
+                return True
+
+        # for i in range(3, int((2 * np.pi * self.k * self.problem1.next_theta(theta0, is_head=True) + 4 * np.pi ** 2) / self.d_body)):
+        #     if self.is_overlap(rectangles[1], rectangles[i]):
+        #         rectangles[1].set_edgecolor('r')
+        #         rectangles[i].set_edgecolor('r')
+        #         return True
+
         return False
 
     def calc_collision_state(self):
-        problem1 = Problem1(k = self.k, d_body = self.d_body, d_head = self.d_head, v0 = self.v0, num = self.num, init_theta0 = self.init_theta0)
-        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{float(self.k * 2 * np.pi) : .2f}的碰撞点"):
-            x, y, v = problem1.get_positions_and_velocities(theta0)
+        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{float(self.k * 2 * np.pi):.2f}的碰撞点"):
+            x, y, v = self.problem1.get_positions_and_velocities(theta0)
             rectangles = self.get_rectangles(x, y)
             if self.check_collision(rectangles, theta0):
                 self.theta0_collision, self.rectangles_collision, self.x_collision, self.y_collision, self.v_collision =  theta0, rectangles, x, y, v
@@ -84,11 +92,11 @@ class Problem2:
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
-        plt.savefig(f"{direct}/pdf/collision_state_{self.k * 2 * np.pi : .2f}.pdf")
+        plt.savefig(f"{direct}/collision_state_{self.k * 2 * np.pi : .2f}.pdf")
         plt.cla()
         plt.clf()
         plt.close()
-        print(f"保存螺距为{self.k * 2 * np.pi : .2f}碰撞状态图像为collision_state_{self.k * 2 * np.pi : .2f}.pdf，存放在{direct}/pdf和{direct}/pgf文件夹里。")
+        print(f"保存螺距为{self.k * 2 * np.pi : .2f}碰撞状态图像为collision_state_{self.k * 2 * np.pi : .2f}.pdf，存放在{direct}文件夹里。")
 
     def save_result(self):
         df = pd.read_excel("problem2/result2.xlsx", sheet_name="Sheet1")

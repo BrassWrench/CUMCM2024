@@ -14,6 +14,9 @@ class Problem1:
         self.num = np.array(num)
         self.init_theta0 = np.array(init_theta0)
 
+    def set_k(self, k):
+        self.k = k
+
     def next_theta(self, theta, is_head=False):
         """θ角递推"""
         k, d_head, d_body = self.k, self.d_head, self.d_body
@@ -100,11 +103,11 @@ class Problem1:
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
-        plt.savefig(f"{direct}/pdf/{t}s.pdf")
+        plt.savefig(f"{direct}/{t}s.pdf")
         plt.cla()
         plt.clf()
         plt.close()
-        print(f"保存t={t}s的图像为{t}s.pdf，存放在{direct}/pdf文件夹里。")
+        print(f"保存t={t}s的图像为{t}s.pdf，存放在{direct}文件夹里。")
 
     def save_result(self):
         """保存结果"""
