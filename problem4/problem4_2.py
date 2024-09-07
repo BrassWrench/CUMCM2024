@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from problem4.problem4_2_old import theta_to_xi_value, xi_to_theta_value
-
-
 class Problem4_2:
 
     slope = np.array(1.17086605)  # 两条直线的斜率
@@ -44,7 +41,7 @@ class Problem4_2:
 
     def xi_to_theta(self, xi):
         if xi.shape == ():
-            return xi_to_theta_value(xi)
+            return self.xi_to_theta_value(xi)
         return np.array([self.xi_to_theta_value(xi) for xi in xi])
 
     def theta_to_xi_value(self, theta, state):
@@ -57,7 +54,7 @@ class Problem4_2:
 
     def theta_to_xi(self, theta, state):
         if theta.shape == ():
-            return theta_to_xi_value(theta, state)
+            return self.theta_to_xi_value(theta, state)
         return np.array([self.theta_to_xi_value(theta, state) for theta in theta])
 
     def f_value(self, xi):

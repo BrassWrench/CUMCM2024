@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from scipy.optimize import fsolve
+from tqdm import tqdm
 from problem4.problem4_2 import Problem4_2
-from problem4.problem4_2_old import xi_to_theta
 
 
 class Problem4_3:
@@ -74,10 +75,10 @@ class Problem4_3:
 
         return result_x, result_y, result_v
 
-    def t_to_xi0(self, t, v0):
+    def t_to_xi0(self, t):
         xi = self.theta_to_xi(self.problem4_2.theta1, state="in")
         if t == 0: return xi
-        target = v0 * t
+        target = self.v0 * t
         direct = np.sign(target)
         integ = 0
         d_xi = direct * 0.001
@@ -87,27 +88,48 @@ class Problem4_3:
         return xi
 
     def save_t_state(self, t, direct):
-        xi0 = self.t_to_xi0(t, self.v0)
+        xi0 = self.t_to_xi0(t)
         x, y, v = self.get_positions_and_velocities(xi0)
 
         xi = self.get_in_and_out((np.max(np.abs(x)) // 1.7 + 2) * 2 * np.pi, 0.001)
         x_curve, y_curve = self.get_xy(xi)
         fig, ax = plt.subplots()
-        plt.plot(x_curve, y_curve, linewidth=0.2)
-        plt.plot(x, y, linewidth=0.4)
-        plt.scatter(x, y, s=0.4)
-        plt.scatter(x[0], y[0], s=1, c='r')
+        plt.plot(x_curve, y_curve, linewidth=1, zorder=1)
+        plt.plot(x, y, linewidth=1, zorder=2)
+        plt.scatter(x[1:], y[1:], s=2, zorder=3)
+        plt.scatter(x[0], y[0], s=5, c='r', zorder=4)
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
-        plt.savefig(f"{direct}/state_{str(t)}s.pdf")
+        plt.savefig(f"{direct}/state_{t}s.pdf")
+        print(f"保存t={t}s的图像为state_{t}s.pdf，存放在{direct}文件夹里。")
         plt.cla()
         plt.clf()
         plt.close()
 
         plt.plot(np.arange(1, len(v) + 1), v)
         plt.grid()
-        plt.savefig(f"{direct}/velocities_{str(t)}s.pdf")
+        plt.savefig(f"{direct}/velocities_{t}s.pdf")
+        print(f"保存t={t}s的速度为state_{t}s.pdf，存放在{direct}文件夹里。")
         plt.cla()
         plt.clf()
         plt.close()
+
+    def save_result(self):
+        df_positions = pd.read_excel("problem4/result4.xlsx", sheet_name="位置")
+        df_velocities = pd.read_excel("problem4/result4.xlsx", sheet_name="速度")
+
+        for t in tqdm(np.arange(-100, 100 + 1, 1), desc="进度"):
+            xi0 = self.t_to_xi0(t)
+            x, y, v = self.get_positions_and_velocities(xi0)
+            for i in range(223 + 1):
+                df_positions.loc[2 * i, str(t) + " s"] = x[i]
+                df_positions.loc[2 * i + 1, str(t) + " s"] = y[i]
+                df_velocities.loc[i, str(t) + " s"] = v[i]
+
+        df_positions.columns.values[0] = ''
+        df_velocities.columns.values[0] = ''
+
+        with pd.ExcelWriter("problem4/result4.xlsx") as writer:
+            df_positions.to_excel(writer, sheet_name="位置", index=False, float_format="%.6f")
+            df_velocities.to_excel(writer, sheet_name="速度", index=False, float_format="%.6f")

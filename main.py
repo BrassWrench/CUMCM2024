@@ -46,5 +46,6 @@ if __name__ == '__main__':
     #problem4_2.save_r_xi("problem4/savefig")
 
     problem4_3 = Problem4_3(d_body=2.2 - 2 * 0.275, d_head=3.41 - 2 * 0.275, v0=1, num=223)
-    problem4_3.save_t_state(15, "problem4/savefig")
+    problem4_3.save_t_state(13, "problem4/savefig")
+    #problem4_3.save_result()
 

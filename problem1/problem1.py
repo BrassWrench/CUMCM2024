@@ -103,11 +103,11 @@ class Problem1:
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
-        plt.savefig(f"{direct}/{t}s.pdf")
+        plt.savefig(f"{direct}/state_{t}s.pdf")
         plt.cla()
         plt.clf()
         plt.close()
-        print(f"保存t={t}s的图像为{t}s.pdf，存放在{direct}文件夹里。")
+        print(f"保存t={t}s的图像为state_{t}s.pdf，存放在{direct}文件夹里。")
 
     def save_result(self):
         """保存结果"""
