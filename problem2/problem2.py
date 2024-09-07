@@ -15,14 +15,14 @@ class Problem2:
         self.v0 = np.array(v0)
         self.num = np.array(num)
         self.init_theta0 = np.array(init_theta0)
+        self.theta0_collision = None
+        self.rectangles_collision = None
+        self.x_collision = None
+        self.y_collision = None
+        self.v_collision = None
 
-    def re_init(self, k, d_body, d_head, v0, num, init_theta0):
+    def set_k(self, k):
         self.k = np.array(k)
-        self.d_body = np.array(d_body)
-        self.d_head = np.array(d_head)
-        self.v0 = np.array(v0)
-        self.num = np.array(num)
-        self.init_theta0 = np.array(init_theta0)
 
     def get_rectangle(self, x, y, x_next, y_next):
         nx = (x_next - x) / np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2)
@@ -34,7 +34,7 @@ class Problem2:
         width = np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2) + 2 * 0.275
         height = 0.3
         angle = np.rad2deg(np.arctan2(y_next - y, x_next - x))
-        rect = patches.Rectangle((anchor_x, anchor_y), width=width, height=height, angle=angle, rotation_point="xy", linewidth=0.5, edgecolor='b', facecolor='none')
+        rect = patches.Rectangle((anchor_x, anchor_y), width=width, height=height, angle=angle, rotation_point="xy", linewidth=0.5, edgecolor='b', facecolor='none', zorder=3)
         return rect
 
     def get_rectangles(self, x, y):
@@ -57,13 +57,14 @@ class Problem2:
                 return True, i
         return False
 
-    def get_collision_state(self):
+    def calc_collision_state(self):
         problem1 = Problem1(k = self.k, d_body = self.d_body, d_head = self.d_head, v0 = self.v0, num = self.num, init_theta0 = self.init_theta0)
-        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{self.k * 2 * np.pi}的碰撞点"):
+        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{float(self.k * 2 * np.pi) : .2f}的碰撞点"):
             x, y, v = problem1.get_positions_and_velocities(theta0)
             rectangles = self.get_rectangles(x, y)
             if self.check_collision(rectangles, theta0):
-                return theta0, rectangles, x, y, v
+                self.theta0_collision, self.rectangles_collision, self.x_collision, self.y_collision, self.v_collision =  theta0, rectangles, x, y, v
+                return
 
     def get_curve(self, round_num):
         """求螺旋曲线"""
@@ -73,29 +74,29 @@ class Problem2:
         y = k * theta * np.sin(theta)
         return x, y
 
-    def save_collision_fig(self, rectangles, x, y, direct):
+    def save_collision_fig(self, direct):
         fig, ax = plt.subplots()
-        x_curve, y_curve = self.get_curve(np.max(np.abs(x)) // (2 * np.pi * self.k) + 2)
-        ax.plot(x_curve, y_curve, linewidth=1)
-        ax.scatter(x, y, s=1, color='green')
-        for rectangle in rectangles:
+        x_curve, y_curve = self.get_curve(np.max(np.abs(self.x_collision)) // (2 * np.pi * self.k) + 2)
+        ax.plot(x_curve, y_curve, linewidth=1, zorder=1)
+        ax.scatter(self.x_collision, self.y_collision, s=1, color='green', zorder=2)
+        for rectangle in self.rectangles_collision:
             ax.add_patch(rectangle)
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
         plt.savefig(f"{direct}/pdf/collision_state_{self.k * 2 * np.pi : .2f}.pdf")
-        plt.savefig(f"{direct}/pgf/collision_state_{self.k * 2 * np.pi : .2f}.pgf")
         plt.cla()
         plt.clf()
-        print(f"保存螺距为{self.k * 2 * np.pi}碰撞状态图像，存放在{direct}/pdf和{direct}/pgf文件夹里。")
+        plt.close()
+        print(f"保存螺距为{self.k * 2 * np.pi : .2f}碰撞状态图像为collision_state_{self.k * 2 * np.pi : .2f}.pdf，存放在{direct}/pdf和{direct}/pgf文件夹里。")
 
-    def save_result(self, x, y, v):
+    def save_result(self):
         df = pd.read_excel("problem2/result2.xlsx", sheet_name="Sheet1")
 
         for i in range(224):
-            df.iloc[i, 1] = x[i]
-            df.iloc[i, 2] = y[i]
-            df.iloc[i, 3] = v[i]
+            df.iloc[i, 1] = self.x_collision[i]
+            df.iloc[i, 2] = self.y_collision[i]
+            df.iloc[i, 3] = self.v_collision[i]
 
         df.columns.values[0] = ''
 

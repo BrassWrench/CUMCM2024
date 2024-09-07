@@ -14,14 +14,6 @@ class Problem1:
         self.num = np.array(num)
         self.init_theta0 = np.array(init_theta0)
 
-    def re_init(self, k, d_body, d_head, v0, num, init_theta0):
-        self.k = np.array(k)
-        self.d_body = np.array(d_body)
-        self.d_head = np.array(d_head)
-        self.v0 = np.array(v0)
-        self.num = np.array(num)
-        self.init_theta0 = np.array(init_theta0)
-
     def next_theta(self, theta, is_head=False):
         """θ角递推"""
         k, d_head, d_body = self.k, self.d_head, self.d_body
@@ -29,6 +21,7 @@ class Problem1:
         def h(theta_prime):
             return theta ** 2 + theta_prime ** 2 - 2 * theta * theta_prime * np.cos(theta_prime - theta) - d ** 2 / k ** 2
         theta_next = fsolve(h, theta + 1)
+        theta_next = theta_next[0]
         return theta_next
 
     def next_v(self, v, theta, theta_next):
@@ -108,10 +101,10 @@ class Problem1:
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
         plt.savefig(f"{direct}/pdf/{t}s.pdf")
-        plt.savefig(f"{direct}/pgf/{t}s.pgf")
         plt.cla()
         plt.clf()
-        print(f"保存t={t}s的图像，存放在{direct}/pdf和{direct}/pgf文件夹里。")
+        plt.close()
+        print(f"保存t={t}s的图像为{t}s.pdf，存放在{direct}/pdf文件夹里。")
 
     def save_result(self):
         """保存结果"""

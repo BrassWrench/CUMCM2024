@@ -6,7 +6,7 @@ from problem1.problem1_old import *
 from problem2.problem2_old import *
 from problem3.problem3_old import *
 from problem4.problem4_1 import *
-from problem4.problem4_2 import *
+from problem4.problem4_2_old import *
 from scipy.optimize import fsolve
 
 mpl.use("pgf")
