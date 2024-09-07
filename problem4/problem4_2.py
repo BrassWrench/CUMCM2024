@@ -2,8 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
-from problem1.problem1 import *
-from problem2.problem2 import *
+from problem1.problem1_old import *
+from problem2.problem2_old import *
 from problem3.problem3 import *
 from scipy.optimize import fsolve
 

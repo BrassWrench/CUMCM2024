@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 from shapely.geometry import Polygon
-from problem1.problem1 import *
+from problem1.problem1_old import *
 
 mpl.use("pgf")
 pgf_with_pdflatex = {

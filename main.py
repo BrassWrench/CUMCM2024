@@ -1,23 +1,17 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import numpy as np
-from problem1.problem1 import *
-from problem2.problem2 import *
-from problem3.problem3 import *
+from problem1 import problem1
 
-def get_inverse_spiral(k, round_num):
-    theta = np.linspace(np.pi, round_num * 2 * np.pi + np.pi, 1000)
-    r = k * (theta - np.pi)
-    x = r * np.cos(theta)
-    y = r * np.sin(theta)
-    return x, y
+mpl.use("pgf")
+pgf_with_pdflatex = {
+    "pgf.texsystem": "xelatex",
+    "pgf.rcfonts": True,
+    "pgf.preamble": r"\usepackage{amsmath}"
+}
+mpl.rcParams.update(pgf_with_pdflatex)
+plt.rcParams['font.family'] = 'serif'
 
-x_spiral, y_spiral = get_spiral(1.7 / (2 * np.pi), 4)
-plt.plot(x_spiral, y_spiral)
+if __name__ == '__main__':
 
-x_spiral, y_spiral = get_inverse_spiral(1.7 / (2 * np.pi), 4)
-plt.plot(x_spiral, y_spiral)
-
-plt.savefig("two_spiral.pdf")
-plt.savefig("two_spiral.pgf")
+    #problem1.save_t_fig(300)
+    problem1.save_xlsx()

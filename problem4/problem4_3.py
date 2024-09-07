@@ -2,8 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
-from problem1.problem1 import *
-from problem2.problem2 import *
+from problem1.problem1_old import *
+from problem2.problem2_old import *
 from problem3.problem3 import *
 from problem4.problem4_1 import *
 from problem4.problem4_2 import *
@@ -114,11 +114,16 @@ if __name__ == '__main__':
     x, y ,v = get_positions_and_velocities(xi0, v0)
 
     x_track, y_track = get_track(np.max(np.abs(x)) // 1.7 + 2)
+    fig, ax = plt.subplots()
     plt.plot(x_track, y_track, linewidth=0.2)
     plt.plot(x, y, linewidth=0.4)
     plt.scatter(x, y, s=0.4)
     plt.scatter(x[0], y[0], s=1, c='r')
+    ax.set_xlim(-np.max(np.abs(x_track)), np.max(np.abs(x_track)))
+    ax.set_ylim(-np.max(np.abs(y_track)), np.max(np.abs(y_track)))
+    ax.set_aspect('equal', adjustable='box')
     plt.savefig("line_graph.pdf")
+    plt.savefig("line_graph.pgf")
     plt.cla()
 
     plt.plot(np.arange(len(v)), v)
