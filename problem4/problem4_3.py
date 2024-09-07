@@ -6,19 +6,15 @@ from tqdm import tqdm
 from problem4.problem4_2 import Problem4_2
 
 
-class Problem4_3:
-    def __init__(self, d_body, d_head, v0, num):
-        self.d_body = d_body
-        self.d_head = d_head
-        self.v0 = v0
-        self.num = num
+class Problem4_3(Problem4_2):
 
-        self.problem4_2 = Problem4_2()
-        self.f = self.problem4_2.f
-        self.get_xy = self.problem4_2.get_xy
-        self.xi_to_theta = self.problem4_2.xi_to_theta
-        self.theta_to_xi = self.problem4_2.theta_to_xi
-        self.get_in_and_out = self.problem4_2.get_in_and_out
+    d_head = 3.41 - 2 * 0.275
+    d_body = 2.2 - 2 * 0.275
+    v0 = 1
+    num = 223
+
+    def __init__(self):
+        super().__init__()
 
     def next_xi(self, xi, is_head=False):
         d = self.d_head if is_head else self.d_body
@@ -76,7 +72,7 @@ class Problem4_3:
         return result_x, result_y, result_v
 
     def t_to_xi0(self, t):
-        xi = self.theta_to_xi(self.problem4_2.theta1, state="in")
+        xi = self.theta_to_xi(self.theta1, state="in")
         if t == 0: return xi
         target = self.v0 * t
         direct = np.sign(target)
@@ -87,10 +83,13 @@ class Problem4_3:
             xi += d_xi
         return xi
 
-    def save_t_state(self, t, direct):
+    def get_t_state(self, t):
         xi0 = self.t_to_xi0(t)
         x, y, v = self.get_positions_and_velocities(xi0)
+        return x, y, v
 
+    def save_t_state(self, t, direct):
+        x, y, v = self.get_t_state(t)
         xi = self.get_in_and_out((np.max(np.abs(x)) // 1.7 + 2) * 2 * np.pi, 0.001)
         x_curve, y_curve = self.get_xy(xi)
         fig, ax = plt.subplots()
