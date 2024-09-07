@@ -36,10 +36,11 @@ def next_v(v, r, r_next, diff, diff_next, phi_s, phi_e):
     v_next = np.abs(v_next)
     return v_next
 
+def get_f_diff(xi):
+    return (f(xi + 0.001) - f(xi)) / 0.001#对xi求导
+
 def get_diff(xi):
-    diff = (f(xi + 0.001) - f(xi)) / 0.001
-    if xi < 0:
-        diff = -diff
+    diff = np.sign(xi) * get_f_diff(xi)#对theta求导
     return diff
 
 def get_positions_and_velocities(xi0, v0):
@@ -95,14 +96,24 @@ def get_positions_and_velocities(xi0, v0):
 
     return result_x, result_y, result_v
 
+def get_xi_from_t(t, v0):
+    xi = xi_to_theta_value(theta1)
+    d_xi = 0.001
+    integ = 0
+    target = v0 * t
+    while integ <= target:
+        integ += np.sqrt(get_f_diff(xi)**2 + f(xi)**2) * d_xi
+        xi += d_xi
+    return xi
+
 if __name__ == '__main__':
 
     x, y ,v = get_positions_and_velocities(15, v0)
 
-    x_track, y_track = get_track(16)
-    plt.plot(x_track, y_track, linewidth=0.1)
-    plt.plot(x, y, linewidth=0.2)
-    plt.scatter(x, y, s=0.2)
+    x_track, y_track = get_track(np.max(x) // 1.7 + 1)
+    plt.plot(x_track, y_track, linewidth=0.2)
+    plt.plot(x, y, linewidth=0.4)
+    plt.scatter(x, y, s=0.4)
     plt.savefig("line_graph.pdf")
     plt.cla()
 

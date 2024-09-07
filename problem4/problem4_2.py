@@ -136,18 +136,18 @@ def paint_trace():
     plt.savefig("f_theta.pgf")
     plt.cla()
 
-    xi = get_in_and_out(5 * 2 * np.pi, 0.001)
-    r = f(xi)
-    ax.plot(xi, r)
-
-    ax.set_xlim(theta_to_xi(5 * 2 * np.pi, state="in"), theta_to_xi(5 * 2 * np.pi, state="out"))
-    ax.set_ylim(0, 10)
-    ax.set_xlabel("$\\xi$")
-    ax.set_ylabel("$r$")
-    ax.set_aspect('equal', adjustable='box')
-    plt.savefig("f_value.pdf")
-    plt.savefig("f_value.pgf")
-    plt.cla()
+    # xi = get_in_and_out(5 * 2 * np.pi, 0.001)
+    # r = f(xi)
+    # ax.plot(xi, r)
+    #
+    # ax.set_xlim(theta_to_xi(5 * 2 * np.pi, state="in"), theta_to_xi(5 * 2 * np.pi, state="out"))
+    # ax.set_ylim(0, 10)
+    # ax.set_xlabel("$\\xi$")
+    # ax.set_ylabel("$r$")
+    # ax.set_aspect('equal', adjustable='box')
+    # plt.savefig("f_value.pdf")
+    # plt.savefig("f_value.pgf")
+    # plt.cla()
 
 def get_track(round_num):
     xi = get_in_and_out(round_num * 2 * np.pi, 0.001)
