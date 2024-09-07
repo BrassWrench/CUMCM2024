@@ -4,7 +4,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
-import time
 
 mpl.use("pgf")
 pgf_with_pdflatex = {
