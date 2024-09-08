@@ -44,7 +44,7 @@ class Problem4_2:
             return self.xi_to_theta_value(xi)
         return np.array([self.xi_to_theta_value(xi) for xi in xi])
 
-    def theta_to_xi_value(self, theta, state):
+    def theta_to_xi_value(self, theta, state="in"):
         theta_in, theta_out = self.theta_in, self.theta_out
         if state == "in" and theta >= theta_in:
             return - (theta - theta_in)
@@ -52,7 +52,7 @@ class Problem4_2:
             return theta - theta_out
         return np.nan
 
-    def theta_to_xi(self, theta, state):
+    def theta_to_xi(self, theta, state="in"):
         if theta.shape == ():
             return self.theta_to_xi_value(theta, state)
         return np.array([self.theta_to_xi_value(theta, state) for theta in theta])

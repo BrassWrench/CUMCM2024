@@ -48,7 +48,7 @@ class Problem4_3(Problem4_2):
         return np.sign(xi) * self.get_diff_xi(xi)
 
     def get_diff_xi(self, xi):
-        return (self.f(xi + 0.01) - self.f(xi)) / 0.01
+        return (self.f(xi + 0.000001) - self.f(xi)) / 0.000001
 
     def get_positions_and_velocities(self, xi0):
         """求每个节点的位置和速度"""
