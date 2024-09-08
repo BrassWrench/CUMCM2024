@@ -6,25 +6,15 @@ from problem1.problem1 import Problem1
 from tqdm import tqdm
 import pandas as pd
 
-class Problem2:
+class Problem2(Problem1):
 
-    def __init__(self, k, d_body, d_head, v0, num, init_theta0):
-        self.k = np.array(k)
-        self.d_body = np.array(d_body)
-        self.d_head = np.array(d_head)
-        self.v0 = np.array(v0)
-        self.num = np.array(num)
-        self.init_theta0 = np.array(init_theta0)
+    def __init__(self):
+        super().__init__()
         self.theta0_collision = None
         self.rectangles_collision = None
         self.x_collision = None
         self.y_collision = None
         self.v_collision = None
-        self.problem1 = Problem1(k = k, d_body = d_body, d_head = d_head, v0 = v0, num = num, init_theta0 = init_theta0)
-
-    def set_k(self, k):
-        self.k = np.array(k)
-        self.problem1.set_k(k)
 
     def get_rectangle(self, x, y, x_next, y_next):
         nx = (x_next - x) / np.sqrt((x_next - x) ** 2 + (y_next - y) ** 2)
@@ -66,9 +56,12 @@ class Problem2:
 
         return False
 
-    def calc_collision_state(self):
-        for theta0 in tqdm(np.flip(np.arange(0, self.init_theta0, 0.1)), desc=f"计算螺距为{float(self.k * 2 * np.pi):.2f}的碰撞点"):
-            x, y, v = self.problem1.get_positions_and_velocities(theta0)
+    def calc_collision_state(self, previous=False, desc=True):
+        start_theta0 = self.theta0_collision if previous else self.init_theta0
+        if start_theta0 is None: start_theta0 = self.init_theta0
+        it = tqdm(np.flip(np.arange(0, start_theta0, 0.1)), desc=f"计算螺距为{float(self.k * 2 * np.pi):.2f}的碰撞点") if desc else np.flip(np.arange(0, start_theta0, 0.1))
+        for theta0 in it:
+            x, y, v = self.get_positions_and_velocities(theta0)
             rectangles = self.get_rectangles(x, y)
             if self.check_collision(rectangles, theta0):
                 self.theta0_collision, self.rectangles_collision, self.x_collision, self.y_collision, self.v_collision =  theta0, rectangles, x, y, v

@@ -6,13 +6,14 @@ from tqdm import tqdm
 
 class Problem1:
 
-    def __init__(self, k, d_body, d_head, v0, num, init_theta0):
-        self.k = np.array(k)
-        self.d_body = np.array(d_body)
-        self.d_head = np.array(d_head)
-        self.v0 = np.array(v0)
-        self.num = np.array(num)
-        self.init_theta0 = np.array(init_theta0)
+    d_body = 2.2 - 2 * 0.275
+    d_head = 3.41 - 2 * 0.275
+    v0 = 1
+    num = 223
+    init_theta0 = 16 * 2 * np.pi
+
+    def __init__(self):
+        self.k = np.array(0.55 / (2 * np.pi))
 
     def set_k(self, k):
         self.k = k
