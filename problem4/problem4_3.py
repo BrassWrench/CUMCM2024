@@ -48,7 +48,7 @@ class Problem4_3(Problem4_2):
         return np.sign(xi) * self.get_diff_xi(xi)
 
     def get_diff_xi(self, xi):
-        return (self.f(xi + 0.00001) - self.f(xi)) / 0.00001
+        return (self.f(xi + 0.01) - self.f(xi)) / 0.01
 
     def get_positions_and_velocities(self, xi0):
         """求每个节点的位置和速度"""
@@ -109,7 +109,7 @@ class Problem4_3(Problem4_2):
         plt.plot(np.arange(1, len(v) + 1), v)
         plt.grid()
         plt.savefig(f"{direct}/velocities_{t}s.pdf")
-        print(f"保存t={t}s的速度为state_{t}s.pdf，存放在{direct}文件夹里。")
+        print(f"保存t={t}s的速度为velocites_{t}s.pdf，存放在{direct}文件夹里。")
         plt.cla()
         plt.clf()
         plt.close()
