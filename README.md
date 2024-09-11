@@ -77,6 +77,8 @@ python main.py
 ## 联系方式
 
 - GitHub仓库地址：[项目链接](https://github.com/BrassWrench/CUMCM2024-A-202408007227)
-- 维护者：[任上旭(哈尔滨工业大学)](https://github.com/BrassWrench)[刘金浩(哈尔滨工业大学)](https://github.com/FarzoneILIN)[秦翊佳(哈尔滨工业大学)](https://github.com/corinamedici)
+- 维护者：[任上旭(哈尔滨工业大学)](https://github.com/BrassWrench)
+- [刘金浩(哈尔滨工业大学)](https://github.com/FarzoneILIN)
+- [秦翊佳(哈尔滨工业大学)](https://github.com/corinamedici)
 
 感谢查看本项目！希望它能够对您的数学建模比赛有所帮助。
