@@ -112,8 +112,8 @@ class Problem1:
 
     def save_result(self):
         """保存结果"""
-        df_positions = pd.read_excel("problem1/result1.xlsx", sheet_name="位置")
-        df_velocities = pd.read_excel("problem1/result1.xlsx", sheet_name="速度")
+        df_positions = pd.read_excel("result/result1.xlsx", sheet_name="位置")
+        df_velocities = pd.read_excel("result/result1.xlsx", sheet_name="速度")
 
         print("开始计算时间t的状态。")
         for t in tqdm(range(300 + 1), desc="计算时间t状态"):
@@ -128,7 +128,7 @@ class Problem1:
         df_positions.columns.values[0] = ''
         df_velocities.columns.values[0] = ''
 
-        with pd.ExcelWriter("problem1/result1.xlsx") as writer:
+        with pd.ExcelWriter("result/result1.xlsx") as writer:
             df_positions.to_excel(writer, sheet_name="位置", index=False, float_format="%.6f")
             df_velocities.to_excel(writer, sheet_name="速度", index=False, float_format="%.6f")
         print("已将计算结果保存到problem1/result1.xlsx中。")

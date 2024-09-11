@@ -17,6 +17,7 @@ class Problem4_3(Problem4_2):
         super().__init__()
 
     def next_xi(self, xi, is_head=False):
+        """ξ迭代"""
         d = self.d_head if is_head else self.d_body
         def g(xi_prime):
             f_xi = self.f(xi)
@@ -26,6 +27,7 @@ class Problem4_3(Problem4_2):
         return xi_next
 
     def next_v(self, v, xi, xi_next):
+        """速度v迭代，用显式求导公式"""
         theta, theta_next = self.xi_to_theta(xi), self.xi_to_theta(xi_next)
         x, y = self.get_xy(xi)
         x_next, y_next = self.get_xy(xi_next)
@@ -33,25 +35,57 @@ class Problem4_3(Problem4_2):
         diff_f, diff_f_next = self.get_diff_theta(xi), self.get_diff_theta(xi_next)
         k_board = (y_next - y) / (x_next - x)
         k_curve = (diff_f * np.sin(theta) + f * np.cos(theta)) / (diff_f * np.cos(theta) - f * np.sin(theta))
-        k_curve_next = (diff_f_next * np.sin(theta_next) + f * np.cos(theta_next)) / (diff_f_next * np.cos(theta_next) - f * np.sin(theta_next))
+        k_curve_next = (diff_f_next * np.sin(theta_next) + f_next * np.cos(theta_next)) / (diff_f_next * np.cos(theta_next) - f_next * np.sin(theta_next))
         phi = np.arctan(k_curve) - np.arctan(k_board)
         phi_next = np.arctan(k_curve_next) - np.arctan(k_board)
         v_next = np.abs((np.cos(phi) / np.cos(phi_next)) * v)
         return v_next
 
     def next_state(self, xi, v, is_head=False):
+        """下一个状态迭代"""
         xi_next = self.next_xi(xi, is_head)
         v_next = self.next_v(v, xi, xi_next)
         return xi_next, v_next
 
+    def get_diff_theta_value(self, xi):
+        """求对θ的导数"""
+        theta1, theta2, theta3_in, theta3_out, theta4 = self.theta1, self.theta2, self.theta3_in, self.theta3_out, self.theta4
+        R1, R2 = self.R1, self.R2
+        r_o1, theta_o1, r_o2, theta_o2 = self.r_o1, self.theta_o1, self.r_o2, self.theta_o2
+        k = self.k
+
+        if xi < 0:
+            theta = self.xi_to_theta_value(xi)
+            if theta > theta1:
+                return k
+            elif theta2 <= theta <= theta1:
+                return -r_o1 * np.sin(theta - theta_o1) + (- 2 * r_o1 * np.cos(theta - theta_o1) *
+                            np.sin(theta - theta_o1)) / np.sqrt(R1 ** 2 - r_o1 ** 2 + (r_o1 * np.cos(theta - theta_o1)) ** 2)
+            elif theta3_in <= theta <= theta2:
+                return -r_o2 * np.sin(theta - theta_o2) - (- 2 * r_o2 * np.cos(theta - theta_o2) *
+                            np.sin(theta - theta_o2)) / np.sqrt(R2 ** 2 - r_o2 ** 2 + (r_o2 * np.cos(theta - theta_o2)) ** 2)
+        elif xi > 0:
+            theta = self.xi_to_theta_value(xi)
+            if theta3_out <= theta <= theta4:
+                return -r_o2 * np.sin(theta - theta_o2) + (- 2 * r_o2 * np.cos(theta - theta_o2) *
+                            np.sin(theta - theta_o2)) / np.sqrt(R2 ** 2 - r_o2 ** 2 + (r_o2 * np.cos(theta - theta_o2)) ** 2)
+            elif theta >= theta4:
+                return k
+        else:
+            return 0
+
     def get_diff_theta(self, xi):
-        return np.sign(xi) * self.get_diff_xi(xi)
+        """求对θ的导数"""
+        if xi.shape == ():
+            return self.get_diff_theta_value(xi)
+        return np.array([self.get_diff_theta_value(xi) for xi in xi])
 
     def get_diff_xi(self, xi):
-        return (self.f(xi + 0.000001) - self.f(xi)) / 0.000001
+        """求对ξ的导数"""
+        return np.sign(xi) * self.get_diff_theta(xi)
 
     def get_positions_and_velocities(self, xi0):
-        """求每个节点的位置和速度"""
+        """求对ξ的导数"""
         v0, num = self.v0, self.num
         x0, y0 = self.get_xy(xi0)
         result_x = np.array([x0])
@@ -62,12 +96,12 @@ class Problem4_3(Problem4_2):
         v = v0
 
         for i in range(num + 1):
-            theta_next, v_next = self.next_state(xi, v, is_head=(i == 0))
-            x_next, y_next = self.get_xy(theta_next)
+            xi_next, v_next = self.next_state(xi, v, is_head=(i == 0))
+            x_next, y_next = self.get_xy(xi_next)
             result_x = np.append(result_x, x_next)
             result_y = np.append(result_y, y_next)
             result_v = np.append(result_v, v_next)
-            xi, v = theta_next, v_next
+            xi, v = xi_next, v_next
 
         return result_x, result_y, result_v
 
@@ -90,13 +124,13 @@ class Problem4_3(Problem4_2):
 
     def save_t_state(self, t, direct):
         x, y, v = self.get_t_state(t)
-        xi = self.get_in_and_out((np.max(np.abs(x)) // 1.7 + 2) * 2 * np.pi, 0.001)
+        xi = self.get_in_and_out((np.max(np.abs(x)) // 1.7 + 1) * 2 * np.pi, 0.001)
         x_curve, y_curve = self.get_xy(xi)
         fig, ax = plt.subplots()
-        plt.plot(x_curve, y_curve, linewidth=1, zorder=1)
-        plt.plot(x, y, linewidth=1, zorder=2)
-        plt.scatter(x[1:], y[1:], s=2, zorder=3)
-        plt.scatter(x[0], y[0], s=5, c='r', zorder=4)
+        ax.plot(x_curve, y_curve, linewidth=1, zorder=1, color='blue')
+        ax.plot(x, y, linewidth=2, zorder=2, color='chocolate')
+        ax.scatter(x[1:], y[1:], s=5, zorder=3, color='royalblue')
+        ax.scatter(x[0], y[0], s=10, zorder=3, color='red')
         ax.set_xlim(-np.max(np.abs(x_curve)), np.max(np.abs(x_curve)))
         ax.set_ylim(-np.max(np.abs(y_curve)), np.max(np.abs(y_curve)))
         ax.set_aspect('equal', adjustable='box')
@@ -106,19 +140,11 @@ class Problem4_3(Problem4_2):
         plt.clf()
         plt.close()
 
-        plt.plot(np.arange(1, len(v) + 1), v)
-        plt.grid()
-        plt.savefig(f"{direct}/velocities_{t}s.pdf")
-        print(f"保存t={t}s的速度为velocites_{t}s.pdf，存放在{direct}文件夹里。")
-        plt.cla()
-        plt.clf()
-        plt.close()
-
     def save_result(self):
-        df_positions = pd.read_excel("problem4/result4.xlsx", sheet_name="位置")
-        df_velocities = pd.read_excel("problem4/result4.xlsx", sheet_name="速度")
+        df_positions = pd.read_excel("result/result4.xlsx", sheet_name="位置")
+        df_velocities = pd.read_excel("result/result4.xlsx", sheet_name="速度")
 
-        for t in tqdm(np.arange(-100, 100 + 1, 1), desc="进度"):
+        for t in tqdm(np.arange(-100, 100 + 1, 1), desc="计算-100s到100s情况并保存到result4.xlsx中"):
             xi0 = self.t_to_xi0(t)
             x, y, v = self.get_positions_and_velocities(xi0)
             for i in range(223 + 1):
@@ -129,6 +155,6 @@ class Problem4_3(Problem4_2):
         df_positions.columns.values[0] = ''
         df_velocities.columns.values[0] = ''
 
-        with pd.ExcelWriter("problem4/result4.xlsx") as writer:
+        with pd.ExcelWriter("result/result4.xlsx") as writer:
             df_positions.to_excel(writer, sheet_name="位置", index=False, float_format="%.6f")
             df_velocities.to_excel(writer, sheet_name="速度", index=False, float_format="%.6f")

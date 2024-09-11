@@ -16,6 +16,11 @@ class Problem4_2:
     O2 = np.array((1.7359324888362324, 2.4484019757238924))  # 第二个圆的圆心
     k = np.array(1.7 / (2 * np.pi))
 
+    r_o1 = np.sqrt(O1[0] ** 2 + O1[1] ** 2)
+    theta_o1 = np.arctan2(O1[1], O1[0])
+    r_o2 = np.sqrt(O2[0] ** 2 + O2[1] ** 2)
+    theta_o2 = np.arctan2(O2[1], O2[0])
+
     r1 = np.sqrt(cut_point1[0] ** 2 + cut_point1[1] ** 2)
     theta1 = np.array(r1 / k)
     r2 = np.sqrt(cut_point2[0] ** 2 + cut_point2[1] ** 2)
@@ -59,7 +64,8 @@ class Problem4_2:
 
     def f_value(self, xi):
         theta1, theta2, theta3_in, theta3_out, theta4 = self.theta1, self.theta2, self.theta3_in, self.theta3_out, self.theta4
-        O1, O2, R1, R2 = self.O1, self.O2, self.R1, self.R2
+        R1, R2 = self.R1, self.R2
+        r_o1, theta_o1, r_o2, theta_o2 = self.r_o1, self.theta_o1, self.r_o2, self.theta_o2
         k = self.k
         r3 = self.r3
 
@@ -68,16 +74,16 @@ class Problem4_2:
             if theta > theta1:
                 return k * theta
             elif theta2 <= theta <= theta1:
-                return O1[0] * np.cos(theta) + O1[1] * np.sin(theta) + np.sqrt(
-                    R1 ** 2 - (O1[0] * np.sin(theta) - O1[1] * np.cos(theta)) ** 2)
+                return r_o1 * np.cos(theta - theta_o1) + np.sqrt(
+                    R1 ** 2 - r_o1 ** 2 + (r_o1 * np.cos(theta - theta_o1)) ** 2)
             elif theta3_in <= theta <= theta2:
-                return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) - np.sqrt(
-                    R2 ** 2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
+                return r_o2 * np.cos(theta - theta_o2) - np.sqrt(
+                    R2 ** 2 - r_o2 ** 2 + (r_o2 * np.cos(theta - theta_o2)) ** 2)
         elif xi > 0:
             theta = self.xi_to_theta_value(xi)
             if theta3_out <= theta <= theta4:
-                return O2[0] * np.cos(theta) + O2[1] * np.sin(theta) + np.sqrt(
-                    R2 ** 2 - (O2[0] * np.sin(theta) - O2[1] * np.cos(theta)) ** 2)
+                return r_o2 * np.cos(theta - theta_o2) + np.sqrt(
+                    R2 ** 2 - r_o2 ** 2 + (r_o2 * np.cos(theta - theta_o2)) ** 2)
             elif theta >= theta4:
                 return k * (theta - np.pi)
         else:

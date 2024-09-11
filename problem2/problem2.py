@@ -48,11 +48,11 @@ class Problem2(Problem1):
                 rectangles[i].set_edgecolor('r')
                 return True
 
-        # for i in range(3, int((2 * np.pi * self.k * self.problem1.next_theta(theta0, is_head=True) + 4 * np.pi ** 2) / self.d_body)):
-        #     if self.is_overlap(rectangles[1], rectangles[i]):
-        #         rectangles[1].set_edgecolor('r')
-        #         rectangles[i].set_edgecolor('r')
-        #         return True
+        for i in range(3, int((2 * np.pi * self.k * self.next_theta(theta0, is_head=True) + 4 * np.pi ** 2) / self.d_body)):
+            if self.is_overlap(rectangles[1], rectangles[i]):
+                rectangles[1].set_edgecolor('r')
+                rectangles[i].set_edgecolor('r')
+                return True
 
         return False
 
@@ -92,7 +92,7 @@ class Problem2(Problem1):
         print(f"保存螺距为{self.k * 2 * np.pi : .2f}碰撞状态图像为collision_state_{self.k * 2 * np.pi : .2f}.pdf，存放在{direct}文件夹里。")
 
     def save_result(self):
-        df = pd.read_excel("problem2/result2.xlsx", sheet_name="Sheet1")
+        df = pd.read_excel("result/result2.xlsx", sheet_name="Sheet1")
 
         for i in range(224):
             df.iloc[i, 1] = self.x_collision[i]
@@ -101,7 +101,7 @@ class Problem2(Problem1):
 
         df.columns.values[0] = ''
 
-        with pd.ExcelWriter("problem2/result2.xlsx") as writer:
+        with pd.ExcelWriter("result/result2.xlsx") as writer:
             df.to_excel(writer, sheet_name="Sheet1", index=False, float_format="%.6f")
 
         print("已将碰撞结果保存到result2.xlsx中。")
