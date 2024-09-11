@@ -27,8 +27,11 @@
    - **result1.xlsx**: 问题一的结果数据文件
    - **result2.xlsx**: 问题二的结果数据文件
    - **result4.xlsx**: 问题四的结果数据文件
-- **thesis.pdf**: 论文文档
-- **README.md**: 本文件
+- **ProblemA.pdf**: A题题目
+- **README.md**: 项目介绍
+- **main.py**: 项目运行入口
+- **requirements.txt**: 依赖库
+- **thesis.pdf**: 论文
 
 ## 使用方法
 
