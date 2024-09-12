@@ -38,8 +38,8 @@
 ### 环境要求
 
 - conda
-- numPy
-- sciPy
+- numpy
+- scipy
 - matplotlib
 - pandas
 - shapely
